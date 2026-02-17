@@ -1,0 +1,31 @@
+[project]
+name = "telco-churn-risk"
+version = "0.1.0"
+description = "Telco churn risk scoring service with sklearn baseline, PyTorch MLP, FastAPI serving, and drift detection."
+authors = [{ name = "Telco Churn Project" }]
+readme = "README.md"
+requires-python = ">=3.10,<3.13"
+dependencies = [
+  "pandas==2.2.2",
+  "numpy==1.26.4",
+  "scipy==1.13.1",
+  "scikit-learn==1.5.1",
+  "joblib==1.4.2",
+  "torch==2.3.1",
+  "fastapi==0.111.0",
+  "uvicorn==0.30.1",
+  "matplotlib>=3.8,<3.11"
+]
+
+
+[project.optional-dependencies]
+dev = ["pytest==8.2.2", "httpx>=0.27,<0.29"]
+
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+

@@ -1,0 +1,31 @@
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+
+DATA_DIR = PROJECT_ROOT / "data"
+RAW_DATA_DIR = DATA_DIR / "raw"
+PROCESSED_DATA_DIR = DATA_DIR / "processed"
+
+RAW_TELCO_PATH = RAW_DATA_DIR / "telco.csv"
+
+MODELS_DIR = PROJECT_ROOT / "models"
+SKLEARN_MODEL_DIR = MODELS_DIR / "sklearn"
+TORCH_MODEL_DIR = MODELS_DIR / "torch"
+
+REPORTS_DIR = PROJECT_ROOT / "reports"
+FIGURES_DIR = REPORTS_DIR / "figures"
+
+SKLEARN_MODEL_PATH = SKLEARN_MODEL_DIR / "model.joblib"
+SKLEARN_METADATA_PATH = SKLEARN_MODEL_DIR / "metadata.json"
+
+TORCH_MODEL_PATH = TORCH_MODEL_DIR / "model.pt"
+TORCH_METADATA_PATH = TORCH_MODEL_DIR / "metadata.json"
+TORCH_PREPROCESSOR_PATH = TORCH_MODEL_DIR / "preprocessor.joblib"
+
+
+METRICS_PATH = REPORTS_DIR / "metrics.json"
+COMPARISON_REPORT_PATH = REPORTS_DIR / "comparison.md"
+DRIFT_REPORT_PATH = REPORTS_DIR / "drift.json"
+
+GLOBAL_SEED = 42
+

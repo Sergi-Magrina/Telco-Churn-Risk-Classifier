@@ -1,0 +1,111 @@
+{
+  "features": {
+    "Contract": {
+      "p_value": 0.9996384816655277,
+      "statistic": 0.0007231673959585591,
+      "type": "categorical"
+    },
+    "Dependents": {
+      "p_value": 0.990746574740153,
+      "statistic": 0.0001345068467819551,
+      "type": "categorical"
+    },
+    "DeviceProtection": {
+      "p_value": 0.9997729776295534,
+      "statistic": 0.0004540962878514477,
+      "type": "categorical"
+    },
+    "InternetService": {
+      "p_value": 0.999846526703876,
+      "statistic": 0.0003069701487109364,
+      "type": "categorical"
+    },
+    "MonthlyCharges": {
+      "p_value": 0.2196495767108939,
+      "statistic": 0.03113991945036721,
+      "type": "numeric"
+    },
+    "MultipleLines": {
+      "p_value": 0.9997359385409615,
+      "statistic": 0.0005281926588084841,
+      "type": "categorical"
+    },
+    "OnlineBackup": {
+      "p_value": 0.9982961875404955,
+      "statistic": 0.0034105311975441937,
+      "type": "categorical"
+    },
+    "OnlineSecurity": {
+      "p_value": 0.9998539496470484,
+      "statistic": 0.0002921220386859391,
+      "type": "categorical"
+    },
+    "PaperlessBilling": {
+      "p_value": 0.9784010407970541,
+      "statistic": 0.000732979164634041,
+      "type": "categorical"
+    },
+    "Partner": {
+      "p_value": 0.9717944209944862,
+      "statistic": 0.0012501752075722078,
+      "type": "categorical"
+    },
+    "PaymentMethod": {
+      "p_value": 0.9999867928956567,
+      "statistic": 0.0013513771649105,
+      "type": "categorical"
+    },
+    "PhoneService": {
+      "p_value": 0.9974643572728525,
+      "statistic": 1.0099443912312433e-05,
+      "type": "categorical"
+    },
+    "SeniorCitizen": {
+      "p_value": 1.0,
+      "statistic": 0.0031120587538497986,
+      "type": "numeric"
+    },
+    "StreamingMovies": {
+      "p_value": 0.9997695100311189,
+      "statistic": 0.00046103307155269217,
+      "type": "categorical"
+    },
+    "StreamingTV": {
+      "p_value": 0.9988883704369305,
+      "statistic": 0.0022244957629642985,
+      "type": "categorical"
+    },
+    "TechSupport": {
+      "p_value": 0.9986999459430153,
+      "statistic": 0.0026017997207997802,
+      "type": "categorical"
+    },
+    "TotalCharges": {
+      "p_value": 0.2929135440963444,
+      "statistic": 0.029014546316038854,
+      "type": "numeric"
+    },
+    "gender": {
+      "p_value": 0.977462913638558,
+      "statistic": 0.0007980515372176109,
+      "type": "categorical"
+    },
+    "tenure": {
+      "p_value": 0.13653298215435364,
+      "statistic": 0.03435280739161336,
+      "type": "numeric"
+    }
+  },
+  "top_drifting_features": [
+    "tenure",
+    "MonthlyCharges",
+    "TotalCharges",
+    "Partner",
+    "gender",
+    "PaperlessBilling",
+    "Dependents",
+    "PhoneService",
+    "OnlineBackup",
+    "TechSupport"
+  ]
+}
