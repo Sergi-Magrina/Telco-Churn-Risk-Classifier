@@ -8,7 +8,7 @@ End-to-end churn prediction system made to demonstrate understanding of **produc
 - drift monitoring
 - FastAPI serving with selectable backend (`sklearn|torch|both`)
 
-![Model Flow](assets/model_flow.png)
+![Model Flow](assets/High-level%20model%20flow.png)
 
 my goal for this project is to predict the probability that a telco customer will churn, so a business can target retention actions (discounts, outreach, contract changes) toward high-risk customers.
 
@@ -18,24 +18,27 @@ The output of this pipeline is a churn probability + a simple risk bucket (`low/
 
 ## Project structure
 
+```text
 .
 ├─ data/
-│ ├─ raw/ # raw CSV input (not committed)
-│ └─ processed/ # optional cleaned CSV (not required, see notes)
+│  ├─ raw/            # raw CSV input (not committed)
+│  └─ processed/      # optional cleaned CSV
 ├─ models/
-│ ├─ sklearn/
-│ │ ├─ model.joblib # full sklearn pipeline (preprocess + LR)
-│ │ └─ metadata.json
-│ └─ torch/
-│ ├─ model.pt # torch state_dict
-│ ├─ metadata.json # includes input_dim, training info
-│ └─ preprocessor.joblib # fitted preprocessor used for torch inference
+│  ├─ sklearn/
+│  │  ├─ model.joblib
+│  │  └─ metadata.json
+│  └─ torch/
+│     ├─ model.pt
+│     ├─ metadata.json
+│     └─ preprocessor.joblib
 ├─ reports/
-│ ├─ metrics.json # evaluation metrics for both models
-│ ├─ comparison.md # markdown summary and recommendation
-│ └─ drift.json # feature drift statistics + ranked features
-├─ scripts/ # entrypoints
-└─ src/ # reusable library code (data, features, modeling, serving)
+│  ├─ metrics.json
+│  ├─ comparison.md
+│  └─ drift.json
+├─ assets/
+├─ scripts/
+└─ src/
+
 
 
 ---
@@ -44,8 +47,8 @@ The output of this pipeline is a churn probability + a simple risk bucket (`low/
 
 - **Source:** IBM Telco Customer Churn dataset (Mine is from https://www.kaggle.com/datasets/blastchar/telco-customer-churn)
 
-- Place the CSV at: `data/raw/telco.csv`
-- **Target:** `Churn` mapped `{Yes → 1, No → 0}`
+- Place the CSV at: data/raw/telco.csv
+- **Target:** `Churn` mapped {Yes → 1, No → 0}
 - **Dropped:** `customerID` (identifier)
 - **Cleaning:** `TotalCharges` is coerced to numeric; rows with invalid values are dropped.
 
@@ -56,36 +59,36 @@ The output of this pipeline is a churn probability + a simple risk bucket (`low/
 All splitting happens before fitting preprocessing to prevent test leakage.
 
 **Numeric features**
-- `SimpleImputer(strategy="median")` for missing values
-- `StandardScaler()` for stable optimization and consistent feature scale
+- SimpleImputer(strategy="median") for missing values
+- StandardScaler() for stable optimization and consistent feature scale
 
 **Categorical features**
-- `SimpleImputer(strategy="most_frequent")`
-- `OneHotEncoder(handle_unknown="ignore")` for robust inference (unknown categories won’t crash the API)
+- SimpleImputer(strategy="most_frequent"
+- OneHotEncoder(handle_unknown="ignore") for robust inference (unknown categories won’t crash the API)
 
-Implemented as a `ColumnTransformer` built from column dtypes.
+Implemented as a ColumnTransformer built from column dtypes.
 
 **Important production detail**
-- sklearn: preprocessing is bundled inside the saved pipeline artifact (`model.joblib`)
-- torch: preprocessing is saved as a separate artifact (`models/torch/preprocessor.joblib`) and loaded by the API
+- sklearn: preprocessing is bundled inside the saved pipeline artifact (model.joblib)
+- torch: preprocessing is saved as a separate artifact (models/torch/preprocessor.joblib) and loaded by the API
 
 ---
 
 ## Models
 
 ### 1) scikit-learn Logistic Regression (baseline)
-- Pipeline: `preprocess → LogisticRegression`
-- Hyperparameter tuning: `GridSearchCV` over `C` 
-- CV scoring metric: ROC-AUC
-- Saved artifact: `models/sklearn/model.joblib` (contains preprocessing + model)
+- Pipeline: preprocess → LogisticRegression
+- Hyperparameter tuning: GridSearchCV over `C` 
+- CV scoring metric used: ROC-AUC
+- Saved artifact (after running script): models/sklearn/model.joblib (contains preprocessing + model)
 
 ### 2) PyTorch MLP (challenger)
 - Trained on the same preprocessed feature space
 - Uses early stopping based on validation ROC-AUC
 - Saved artifacts:
-  - `models/torch/model.pt`
-  - `models/torch/metadata.json`
-  - `models/torch/preprocessor.joblib` (**required for correct inference**)
+  - models/torch/model.pt
+  - models/torch/metadata.json
+  - models/torch/preprocessor.joblib (**required for correct inference**)
 
 ---
 
@@ -98,21 +101,21 @@ The evaluation pipeline produces:
 - Latency: ms per inference run on a sample
 
 Outputs:
-- `reports/metrics.json`
-- `reports/comparison.md`
+- reports/metrics.json
+- reports/comparison.md
 
-![ROC Curve](assets/roc_curve.png)
+<p align="center"> <img src="assets/roc_curve.png" width="520" alt="ROC curve comparison"> </p>
 
 ---
 
 ## Drift monitoring
 
-`drift_report` compares reference vs current feature distributions:
+drift_report compares reference vs current feature distributions:
 - Numeric features: KS test
 - Categorical features: chi-square test on normalized frequencies
 
 Output:
-- `reports/drift.json` (per-feature stats + ranked top drifting features)
+- reports/drift.json (per-feature stats + ranked top drifting features)
 
 From my results I found that there is no evidence of drift as all the p-values are close to 1
 
@@ -120,9 +123,8 @@ From my results I found that there is no evidence of drift as all the p-values a
 
 ## Quickstart
 
-### 1) Environment setup
+1) Environment setup
 
-```bash
 python -m venv .venv
 # Windows:
 .venv\Scripts\activate
@@ -185,6 +187,7 @@ python -m venv .venv
 python -m pip install --upgrade pip setuptools wheel
 pip install -r requirements.txt
 
+make sure dataset is in required place (specified above)
 python -m scripts.train_sklearn
 python -m scripts.train_torch
 python -m scripts.evaluate_models
