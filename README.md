@@ -126,14 +126,11 @@ From my results I found that there is no evidence of drift as all the p-values a
 1) Environment setup
 
 python -m venv .venv
-# Windows:
 .venv\Scripts\activate
-# macOS/Linux:
-source .venv/bin/activate
 
 pip install -r requirements.txt
 
-Place dataset:
+Place Telco dataset:
 data/raw/telco.csv
 
 2) Train models
