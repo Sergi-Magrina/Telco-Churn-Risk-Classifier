@@ -63,7 +63,7 @@ All splitting happens before fitting preprocessing to prevent test leakage.
 - StandardScaler() for stable optimization and consistent feature scale
 
 **Categorical features**
-- SimpleImputer(strategy="most_frequent"
+- SimpleImputer(strategy="most_frequent")
 - OneHotEncoder(handle_unknown="ignore") for robust inference (unknown categories won’t crash the API)
 
 Implemented as a ColumnTransformer built from column dtypes.
