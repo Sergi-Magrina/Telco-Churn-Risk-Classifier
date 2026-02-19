@@ -1,24 +1,49 @@
 from __future__ import annotations
-from pydantic import BaseModel, Field
-
+from pydantic import BaseModel, ConfigDict, Field
 
 class CustomerInput(BaseModel):
-    gender: str = Field(..., example="Female")
-    SeniorCitizen: int = Field(..., example=0)
-    Partner: str = Field(..., example="Yes")
-    Dependents: str = Field(..., example="No")
-    tenure: int = Field(..., example=12)
-    PhoneService: str = Field(..., example="Yes")
-    MultipleLines: str = Field(..., example="No")
-    InternetService: str = Field(..., example="Fiber optic")
-    OnlineSecurity: str = Field(..., example="No")
-    OnlineBackup: str = Field(..., example="Yes")
-    DeviceProtection: str = Field(..., example="No")
-    TechSupport: str = Field(..., example="No")
-    StreamingTV: str = Field(..., example="Yes")
-    StreamingMovies: str = Field(..., example="Yes")
-    Contract: str = Field(..., example="Month-to-month")
-    PaperlessBilling: str = Field(..., example="Yes")
-    PaymentMethod: str = Field(..., example="Electronic check")
-    MonthlyCharges: float = Field(..., example=79.85)
-    TotalCharges: float = Field(..., example=1000.50)
+    gender: str = Field(..., description="Customer gender")
+    SeniorCitizen: int = Field(..., ge=0, le=1)
+    Partner: str
+    Dependents: str
+    tenure: int = Field(..., ge=0)
+    PhoneService: str
+    MultipleLines: str
+    InternetService: str
+    OnlineSecurity: str
+    OnlineBackup: str
+    DeviceProtection: str
+    TechSupport: str
+    StreamingTV: str
+    StreamingMovies: str
+    Contract: str
+    PaperlessBilling: str
+    PaymentMethod: str
+    MonthlyCharges: float = Field(..., ge=0)
+    TotalCharges: float = Field(..., ge=0)
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "gender": "Female",
+                "SeniorCitizen": 0,
+                "Partner": "Yes",
+                "Dependents": "No",
+                "tenure": 1,
+                "PhoneService": "No",
+                "MultipleLines": "No phone service",
+                "InternetService": "DSL",
+                "OnlineSecurity": "No",
+                "OnlineBackup": "Yes",
+                "DeviceProtection": "No",
+                "TechSupport": "No",
+                "StreamingTV": "No",
+                "StreamingMovies": "No",
+                "Contract": "Month-to-month",
+                "PaperlessBilling": "Yes",
+                "PaymentMethod": "Electronic check",
+                "MonthlyCharges": 29.85,
+                "TotalCharges": 29.85
+            }
+        }
+    )
