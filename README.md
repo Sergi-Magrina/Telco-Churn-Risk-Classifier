@@ -39,7 +39,7 @@ The output of this pipeline is a churn probability + a simple risk bucket (`low/
 ├─ scripts/
 └─ src/
 
-
+```
 
 ---
 
@@ -63,7 +63,7 @@ All splitting happens before fitting preprocessing to prevent test leakage.
 - StandardScaler() for stable optimization and consistent feature scale
 
 **Categorical features**
-- SimpleImputer(strategy="most_frequent"
+- SimpleImputer(strategy="most_frequent")
 - OneHotEncoder(handle_unknown="ignore") for robust inference (unknown categories won’t crash the API)
 
 Implemented as a ColumnTransformer built from column dtypes.
@@ -126,14 +126,11 @@ From my results I found that there is no evidence of drift as all the p-values a
 1) Environment setup
 
 python -m venv .venv
-# Windows:
 .venv\Scripts\activate
-# macOS/Linux:
-source .venv/bin/activate
 
 pip install -r requirements.txt
 
-Place dataset:
+Place Telco dataset:
 data/raw/telco.csv
 
 2) Train models
