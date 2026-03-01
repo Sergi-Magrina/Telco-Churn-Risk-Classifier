@@ -4,7 +4,7 @@ from typing import Any, Dict, Optional
 
 import pandas as pd
 import torch
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Query, Body
 from joblib import load as joblib_load
 
 from src.config import (
@@ -24,6 +24,30 @@ app = FastAPI(title="Telco Churn Risk API")
 SKLEARN_PIPELINE = None
 TORCH_MODEL = None
 TORCH_PREPROCESSOR = None
+
+# Request-body example shown in Swagger UI (/docs)
+EXAMPLE_CUSTOMER: Dict[str, Any] = {
+    "gender": "Female",
+    "SeniorCitizen": 0,
+    "Partner": "Yes",
+    "Dependents": "No",
+    "tenure": 1,
+    "PhoneService": "No",
+    "MultipleLines": "No phone service",
+    "InternetService": "DSL",
+    "OnlineSecurity": "No",
+    "OnlineBackup": "Yes",
+    "DeviceProtection": "No",
+    "TechSupport": "No",
+    "StreamingTV": "No",
+    "StreamingMovies": "No",
+    "Contract": "Month-to-month",
+    "PaperlessBilling": "Yes",
+    "PaymentMethod": "Electronic check",
+    "MonthlyCharges": 29.85,
+    "TotalCharges": 29.85,
+}
+
 
 
 def _payload_to_df(payload: CustomerInput) -> pd.DataFrame:
@@ -95,7 +119,7 @@ def root():
 
 @app.post("/predict")
 def predict(
-    payload: CustomerInput,
+    payload: CustomerInput = Body(..., openapi_examples={"demo": {"summary": "Demo customer", "value": EXAMPLE_CUSTOMER}}),
     backend: str = Query("sklearn", pattern="^(sklearn|torch|both)$"),
 ) -> Dict[str, Any]:
     df = _payload_to_df(payload)
