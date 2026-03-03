@@ -1,22 +1,26 @@
 from __future__ import annotations
 
-from typing import Any, Dict, Optional
+import os
+from pathlib import Path
+from typing import Any, Dict
+
+from urllib.request import urlopen
 
 import pandas as pd
 import torch
-from fastapi import FastAPI, Query, Body
+from fastapi import Body, FastAPI, Query
 from joblib import load as joblib_load
 
 from src.config import (
+    SKLEARN_METADATA_PATH,
     SKLEARN_MODEL_PATH,
     TORCH_METADATA_PATH,
     TORCH_MODEL_PATH,
     TORCH_PREPROCESSOR_PATH,
 )
 from src.modeling.torch_model import TelcoMLP, predict_proba_torch
-from src.utils.io import load_json
 from src.serving.schemas import CustomerInput
-
+from src.utils.io import load_json
 
 app = FastAPI(title="Telco Churn Risk API")
 
@@ -49,6 +53,28 @@ EXAMPLE_CUSTOMER: Dict[str, Any] = {
 }
 
 
+def _ensure_file(local_path: Path, url_env_key: str) -> None:
+    """
+    Ensure `local_path` exists. If missing, download it from the URL stored in env var `url_env_key`.
+    This is required on Render because the instance filesystem won't contain locally-trained artifacts.
+    """
+    if local_path.exists():
+        return
+
+    url = os.getenv(url_env_key)
+    if not url:
+        raise RuntimeError(
+            f"Missing required file: {local_path}. "
+            f"Set env var {url_env_key} to a direct download URL "
+            f"(e.g. Hugging Face /resolve/main/... link)."
+        )
+
+    local_path.parent.mkdir(parents=True, exist_ok=True)
+
+    print(f"[startup] Downloading {url_env_key} -> {local_path}")
+    with urlopen(url) as r, open(local_path, "wb") as f:
+        f.write(r.read())
+
 
 def _payload_to_df(payload: CustomerInput) -> pd.DataFrame:
     # pydantic v2 uses model_dump; v1 uses dict
@@ -76,7 +102,6 @@ def _predict_torch(df: pd.DataFrame) -> float:
     if hasattr(X_proc, "toarray"):
         X_proc = X_proc.toarray()
 
-    # predict_proba_torch will return an array-like of probabilities
     p = predict_proba_torch(TORCH_MODEL, X_proc)[0]
     return float(p)
 
@@ -85,13 +110,20 @@ def _predict_torch(df: pd.DataFrame) -> float:
 def startup_load_artifacts() -> None:
     global SKLEARN_PIPELINE, TORCH_MODEL, TORCH_PREPROCESSOR
 
-    # 1) sklearn pipeline already includes preprocessing
+    # --- Download missing artifacts (Render) ---
+    _ensure_file(SKLEARN_MODEL_PATH, "SKLEARN_MODEL_URL")
+    _ensure_file(SKLEARN_METADATA_PATH, "SKLEARN_META_URL")
+
+    _ensure_file(TORCH_MODEL_PATH, "TORCH_MODEL_URL")
+    _ensure_file(TORCH_PREPROCESSOR_PATH, "TORCH_PREP_URL")
+    _ensure_file(TORCH_METADATA_PATH, "TORCH_META_URL")
+
+    # --- Load sklearn ---
     SKLEARN_PIPELINE = joblib_load(SKLEARN_MODEL_PATH)
 
-    # 2) torch preprocessor must be the fitted one saved during training
+    # --- Load torch preprocessor + model ---
     TORCH_PREPROCESSOR = joblib_load(TORCH_PREPROCESSOR_PATH)
 
-    # 3) torch model
     meta = load_json(TORCH_METADATA_PATH)
     input_dim = int(meta["input_dim"])
 
@@ -119,7 +151,12 @@ def root():
 
 @app.post("/predict")
 def predict(
-    payload: CustomerInput = Body(..., openapi_examples={"demo": {"summary": "Demo customer", "value": EXAMPLE_CUSTOMER}}),
+    payload: CustomerInput = Body(
+        ...,
+        openapi_examples={
+            "demo": {"summary": "Demo customer", "value": EXAMPLE_CUSTOMER}
+        },
+    ),
     backend: str = Query("sklearn", pattern="^(sklearn|torch|both)$"),
 ) -> Dict[str, Any]:
     df = _payload_to_df(payload)
