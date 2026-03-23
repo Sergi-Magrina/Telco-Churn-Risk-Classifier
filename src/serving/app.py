@@ -151,12 +151,7 @@ def root():
 
 @app.post("/predict")
 def predict(
-    payload: CustomerInput = Body(
-        ...,
-        openapi_examples={
-            "demo": {"summary": "Demo customer", "value": EXAMPLE_CUSTOMER}
-        },
-    ),
+    payload: CustomerInput = Body(example=EXAMPLE_CUSTOMER),
     backend: str = Query("sklearn", pattern="^(sklearn|torch|both)$"),
 ) -> Dict[str, Any]:
     df = _payload_to_df(payload)
